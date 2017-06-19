@@ -24,6 +24,8 @@
 # frames and metadata to an external program/network.  It also knows how to import
 # AMBE and metadata from an external network and send the DMR frames to IPSC networks.
 
+#####################################################################################################
+
 from __future__ import print_function
 from twisted.internet import reactor
 from binascii import b2a_hex as h
@@ -113,8 +115,8 @@ class ambeIPSC(IPSC):
         self.readConfigFile(self._configFile, None, self._currentNetwork)
     
         logger.info('DMRLink IPSC Bridge')
-        if self._gateway_dmr_id == 0:
-            sys.exit( "Error: gatewayDmrId must be set (greater than zero)" )
+        # if self._gateway_dmr_id == 0:
+        #     sys.exit( "Error: gatewayDmrId must be set (greater than zero)" )
         #
         # Open output sincs
         #
@@ -168,15 +170,15 @@ class ambeIPSC(IPSC):
             self._gateway = self.defaultOption(config, sec,'gateway', self._gateway)
             self._gateway_port = int(self.defaultOption(config, sec,'toGatewayPort', self._gateway_port))
 
-            self._remote_control_port = int(self.defaultOption(config, sec,'remoteControlPort', self._remote_control_port))
+            # self._remote_control_port = int(self.defaultOption(config, sec,'remoteControlPort', self._remote_control_port))
             self._ambeRxPort = int(self.defaultOption(config, sec,'fromGatewayPort', self._ambeRxPort))
-            self._gateway_dmr_id = int(self.defaultOption(config, sec, 'gatewayDmrId', self._gateway_dmr_id))
+            # self._gateway_dmr_id = int(self.defaultOption(config, sec, 'gatewayDmrId', self._gateway_dmr_id))
 
-            _tgs = self.defaultOption(config, sec,'tgFilter', str(self._tg_filter).strip('[]'))
-            self._tg_filter = map(int, _tgs.split(','))
+            # _tgs = self.defaultOption(config, sec,'tgFilter', str(self._tg_filter).strip('[]'))
+            # self._tg_filter = map(int, _tgs.split(','))
 
-            self._tx_tg = hex_str_3(int(self.defaultOption(config, sec, 'txTg', int_id(self._tx_tg))))
-            self._tx_ts = int(self.defaultOption(config, sec, 'txTs', self._tx_ts))
+            # self._tx_tg = hex_str_3(int(self.defaultOption(config, sec, 'txTg', int_id(self._tx_tg))))
+            # self._tx_ts = int(self.defaultOption(config, sec, 'txTs', self._tx_ts))
 
         except ConfigParser.NoOptionError as e:
             print('Using a default value:', e)
