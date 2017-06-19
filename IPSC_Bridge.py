@@ -161,7 +161,7 @@ class ambeIPSC(IPSC):
             if sec == None:
                 sec = self.defaultOption(config, 'DEFAULTS', 'section', networkName)
             if config.has_section(sec) == False:
-                logger.error('Section ' + sec + ' was not found, using DEFAULTS')
+                logger.info('Section ' + sec + ' was not found, using DEFAULTS')
                 sec = 'DEFAULTS'
             self._debug = bool(self.defaultOption(config, sec,'debug', self._debug) == 'True')
             self._outToFile = bool(self.defaultOption(config, sec,'outToFile', self._outToFile) == 'True')
@@ -277,8 +277,6 @@ if __name__ == '__main__':
 
     from ipsc.dmrlink_log import config_logging    
     from ipsc.dmrlink_config import build_config
-#   import dmrlink_log
-#   import dmrlink_config
     
     # Change the current directory to the location of the application
     os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
@@ -294,7 +292,6 @@ if __name__ == '__main__':
         cli_args.CFG_FILE = os.path.dirname(os.path.abspath(__file__))+'/dmrlink.cfg'
     
     # Call the external routine to build the configuration dictionary
-#   CONFIG = dmrlink_config.build_config(cli_args.CFG_FILE)
     CONFIG = build_config(cli_args.CFG_FILE)
     
     # Call the external routing to start the system logger
@@ -302,7 +299,6 @@ if __name__ == '__main__':
         CONFIG['LOGGER']['LOG_LEVEL'] = cli_args.LOG_LEVEL
     if cli_args.LOG_HANDLERS:
         CONFIG['LOGGER']['LOG_HANDLERS'] = cli_args.LOG_HANDLERS
-#   logger = dmrlink_log.config_logging(CONFIG['LOGGER'])
     logger = config_logging(CONFIG['LOGGER'])  
 
     logger.info('DMRlink \'IPSC_Bridge.py\' (c) 2015 N0MJS & the K0USY Group - SYSTEM STARTING...')
