@@ -67,7 +67,6 @@ except ImportError:
 #
 class ambeIPSC(IPSC):
 
-    _configFile='IPSC_Bridge.cfg'                       # Name of the config file to over-ride these default values
     _gateway = "127.0.0.1"                              # IP address of  app
     _gateway_port = 31000                               # Port Analog_Bridge is listening on for AMBE frames to decode
     _ambeRxPort = 31003                                 # Port to listen on for AMBE frames to transmit to all peers
@@ -81,7 +80,7 @@ class ambeIPSC(IPSC):
     #_d = None
     ###### DEBUGDEBUGDEBUG
     
-    def __init__(self, _name, _config, _logger, _report):
+    def __init__(self, _name, _config, _logger, _report, _configFile):
         IPSC.__init__(self, _name, _config, _logger, _report)
         
         #
@@ -89,7 +88,7 @@ class ambeIPSC(IPSC):
         #
         
         self._currentNetwork = str(_name)
-        self.readConfigFile(self._configFile, None, self._currentNetwork)
+        self.readConfigFile(_configFile, None, self._currentNetwork)
     
         logger.info('DMRLink IPSC Bridge')
 
@@ -234,17 +233,23 @@ if __name__ == '__main__':
 
     # CLI argument parser - handles picking up the config file from the command line, and sending a "help" message
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', action='store', dest='CFG_FILE', help='/full/path/to/config.file (usually dmrlink.cfg)')
+    parser.add_argument('-c', '--config', action='store', dest='CFG_FILE', help='/full/path/to/config.file (default dmrlink.cfg)')
     parser.add_argument('-ll', '--log_level', action='store', dest='LOG_LEVEL', help='Override config file logging level.')
     parser.add_argument('-lh', '--log_handle', action='store', dest='LOG_HANDLERS', help='Override config file logging handler.')
+    parser.add_argument('-bc','--bridge_config', action='store', dest='BRIDGE_CONFIG_FILE', help='/full/path/to/bridgeconfig.cfg (default IPSC_Bridge.cfg)')
+    
     cli_args = parser.parse_args()
 
     if not cli_args.CFG_FILE:
         cli_args.CFG_FILE = os.path.dirname(os.path.abspath(__file__))+'/dmrlink.cfg'
+
+    # Ensure we have a path for the bridge config file, if one wasn't specified, then use the default (top of file)
+    if not cli_args.BRIDGE_CONFIG_FILE:
+        cli_args.BRIDGE_CONFIG_FILE = os.path.dirname(os.path.abspath(__file__))+'/IPSC_Bridge.cfg'
     
     # Call the external routine to build the configuration dictionary
     CONFIG = build_config(cli_args.CFG_FILE)
-    
+
     # Call the external routing to start the system logger
     if cli_args.LOG_LEVEL:
         CONFIG['LOGGER']['LOG_LEVEL'] = cli_args.LOG_LEVEL
@@ -299,7 +304,7 @@ if __name__ == '__main__':
     # INITIALIZE AN IPSC OBJECT (SELF SUSTAINING) FOR EACH CONFIGUED IPSC
     for system in CONFIG['SYSTEMS']:
         if CONFIG['SYSTEMS'][system]['LOCAL']['ENABLED']:
-            systems[system] = ambeIPSC(system, CONFIG, logger, report_server)
+            systems[system] = ambeIPSC(system, CONFIG, logger, report_server, cli_args.BRIDGE_CONFIG_FILE)
             reactor.listenUDP(CONFIG['SYSTEMS'][system]['LOCAL']['PORT'], systems[system], interface=CONFIG['SYSTEMS'][system]['LOCAL']['IP'])
     
     reactor.run()
